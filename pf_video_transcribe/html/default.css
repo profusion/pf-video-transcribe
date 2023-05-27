@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@100;400;700&display=swap");
+
+body {
+    font-family: "Exo 2", sans-serif;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: #fff;
+    background-color: #000;
+}
+video#viewer {
+    border: 1px solid #2f334b;
+    display: block;
+    height: 60vh;
+    margin: auto;
+}
+div#transcription {
+    color: #2f334b;
+    background-color: #fff;
+    height: 40vh;
+    overflow: scroll;
+}
+div.segment {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+div.segment:hover {
+    background-color: #eee;
+}
+a.timestamp {
+    flex: 0 0 6.5rem;
+    font-size: 0.8rem;
+    line-height: 1.5rem;
+    color: #ccc;
+    text-decoration: none;
+}
+div.segment.active > a.timestamp {
+    color: #63c3d1;
+}
+a.timestamp > span.start::after {
+    content: "→";
+}
+p.text {
+    flex-grow: 1;
+    max-width: 60vw;
+    padding-left: 0.5rem;
+    margin: 0 5rem 0 0;
+    color: #999;
+}
+div.segment.active > p.text,
+div.segment:hover > p.text {
+    color: #2f334b;
+}
+span.word.active {
+    text-decoration: underline;
+    text-decoration-color: #999;
+}
+button#go-to-current {
+    position: absolute;
+    right: 0;
+    top: 60vh;
+    font-family: "Exo 2", sans-serif;
+    font-size: 0.8rem;
+    color: #fff;
+    background-color: #63c3d1;
+    border: 0;
+    border-radius: 1rem;
+    margin: 1rem;
+    padding: 0.5rem;
+    opacity: 0;
+}
+button#go-to-current.visible {
+    opacity: 1;
+}

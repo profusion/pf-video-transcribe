@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>{{ title }}</title>
+        {%- if image %}
+        <meta property="og:image" content="{{ image }}" />
+        {%- endif %}
+        {%- if video %}
+        <meta property="og:video" content="{{ video }}" />
+        {%- endif %}
+        <link href="{{ stylesheet }}" rel="stylesheet" />
+        {%- for entry in html_head_entry %}
+        {{ entry | safe }}
+        {%- endfor %}
+    </head>
+    <body>
+        <video id="viewer">
+            <source src="{{ media_filename }}"
+                {%- if mime_type %} type="{{ mime_type }}" {% endif -%}
+            />
+            <track kind="subtitles" srclang="{{ language }}" src="{{ vtt_filename }}" default />
+        </video>
+        <div id="transcription">
+        {%- for segment in segments %}
+            <div id="segment/{{ loop.index }}" class="segment" data-start="{{ segment.start }}" data-end="{{ segment.end }}">
+                <a class="timestamp" href="#segment/{{ loop.index }}">
+                    <span class="start">{{ segment.start | format_timestamp(decimal_marker=None) }}</span>
+                    <span class="end">{{ segment.end | format_timestamp(decimal_marker=None) }}</span>
+                </a>
+                <p class="text">
+                {%- for word in segment.words %}
+                    <span class="word" data-start="{{ word.start }}" data-end="{{ word.end }}">{{ word.text }}</span>
+                {%- endfor %}
+                </p>
+            </div>
+        {%- endfor %}
+        </div>
+        <script src="{{ javascript }}"></script>
+    </body>
+</html>

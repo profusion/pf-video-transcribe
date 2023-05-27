@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>List of Videos</title>
+        <link
+            rel="preconnect"
+            crossorigin
+            href="https://fonts.gstatic.com"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;400;700&display=swap"
+            rel="stylesheet"
+        />
+        <style type="text/css">
+            body {
+                font-family: "Exo 2", sans-serif;
+                font-size: 1rem;
+                line-height: 1.5rem;
+                color: #2f334b;
+                background-color: #fff;
+            }
+            a {
+                color: #63c3d1;
+            }
+            a:visited {
+                color: #2f334b;
+            }
+            span.index-label, .index-preview {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Index</h1>
+        {%- for name, items in groups %}
+        <h2 id="section/{{ name | urlencode }}">{{ name }}</h2>
+        <ul class="index-list">
+            {%- for info in items %}
+            <li>
+                <a href="{{ info.path }}">
+                    <span class="index-label">{{ info.title }}</span>
+                    {%- if info.image %}
+                    <img class="index-preview" src="{{ info.image }}" />
+                    {%- elif info.video %}
+                    <video class="index-preview" autoplay>
+                        <source src="{{ info.video }}" />
+                    </video>
+                    {% endif %}
+                </a>
+            </li>
+            {%- endfor %}
+        </ul>
+        {%- endfor %}
+    </body>
+</html>

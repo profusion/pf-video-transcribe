@@ -1,0 +1,5 @@
+{% for seg in segments %}
+{{ loop.index }}
+{{ seg.start | format_timestamp(True, ",") }} --> {{ seg.end | format_timestamp(True, ",") }}
+{{ seg.text | trim }}
+{% endfor %}
