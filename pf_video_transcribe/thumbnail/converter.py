@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from dataclasses import KW_ONLY
 import functools
 import logging
 
@@ -20,10 +22,12 @@ def get_media_filename(f: str) -> str:
     return f
 
 
+@dataclass
 class ThumbnailConverter(AbstractConverter):
     ext = "jpeg"
     logger = _inf
 
+    _: KW_ONLY
     size: Size
 
     def __init__(

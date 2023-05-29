@@ -1,10 +1,12 @@
 from abc import ABC
 from abc import abstractmethod
+from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import field
+from dataclasses import KW_ONLY
 from typing import Any
 from typing import Callable
-from typing import cast
 from typing import ClassVar
-from typing import Generic
 from typing import Mapping
 from typing import Sequence
 from typing import TypeVar
@@ -17,26 +19,21 @@ from .utils import needs_generate
 from .utils import replace_ext
 
 T = TypeVar("T", bound="AbstractConverter")
-KT = TypeVar("KT", bound=Mapping[str, Any])
 
 
+@dataclass
 class AbstractConverter(ABC):
     ext: ClassVar[str]
     logger: ClassVar[Callable[[str], None]]
 
-    force: bool
     input_filename: str
-    filename: str
-    generated: bool
+    force: bool
+    _: KW_ONLY
+    filename: str = field(init=False)
+    generated: bool = field(init=False)
 
-    def __init__(
-        self,
-        input_filename: str,
-        force: bool,
-    ) -> None:
-        self.input_filename = input_filename
-        self.force = force
-        self.filename = self.create_output_name(input_filename)
+    def __post_init__(self) -> None:
+        self.filename = self.create_output_name(self.input_filename)
         self.generated = False
         self._write()
 
@@ -77,24 +74,13 @@ class AbstractConverter(ABC):
         cls: type[T],
         input_filenames: Sequence[str],
         force: bool,
-        **kwargs: object,
+        **kwargs: Any,
     ) -> Sequence[T]:
         return [cls(f, force, **kwargs) for f in input_filenames]
 
 
-class AbstractJsonlConverter(AbstractConverter, Generic[KT]):
+class AbstractJsonlConverter(AbstractConverter):
     template_name: ClassVar[str]
-
-    kwargs: KT
-
-    def __init__(
-        self,
-        input_filename: str,
-        force: bool,
-        **kwargs: Any,
-    ) -> None:
-        self.kwargs = cast(KT, kwargs)
-        super().__init__(input_filename, force)
 
     def generate(self) -> None:
         tmpl = get_template(self.template_name)
@@ -105,4 +91,4 @@ class AbstractJsonlConverter(AbstractConverter, Generic[KT]):
                     out.write(chunk)
 
     def get_template_context(self, reader: Reader) -> Mapping[str, object]:
-        return {**self.kwargs, "reader": reader}
+        return {**asdict(self), "reader": reader}

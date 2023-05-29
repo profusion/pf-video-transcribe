@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from dataclasses import KW_ONLY
 import functools
 import importlib.resources
 import logging
@@ -7,7 +9,7 @@ from mimetypes import guess_type
 import os.path
 import re
 import shutil
-from typing import TypedDict
+from typing import ClassVar
 
 from termcolor import colored
 
@@ -30,22 +32,17 @@ def _gen_title_from_filename(filename: str) -> str:
     return _clean_title_from_path_re.sub(" ", name).title()
 
 
-KT = TypedDict(
-    "KT",
-    {
-        "html_head_entry": list[str],
-        "stylesheet": str,
-        "javascript": str,
-    },
-)
-
-
-class HTMLConverter(AbstractJsonlConverter[KT]):
+@dataclass
+class HTMLConverter(AbstractJsonlConverter):
     ext = "html"
     template_name = "write.html.jinja2"
     logger = _inf
 
-    default_resource_name = __name__.replace(".html.converter", "")
+    default_resource_name: ClassVar[str] = __name__.replace(".html.converter", "")
+    _: KW_ONLY
+    html_head_entry: list[str]
+    stylesheet: str
+    javascript: str
 
     def get_template_context(self, reader: Reader) -> dict:
         media_filename = reader.media_filename
@@ -58,12 +55,10 @@ class HTMLConverter(AbstractJsonlConverter[KT]):
         else:
             image = ""
 
-        html_head_entry = self.kwargs["html_head_entry"]
-
         return {
             "javascript": self._get_and_copy_javascript(),
             "stylesheet": self._get_and_copy_stylesheet(),
-            "html_head_entry": html_head_entry,
+            "html_head_entry": self.html_head_entry,
             "image": image,
             "language": reader.language,
             "media_filename": base_media_filename,
@@ -74,15 +69,13 @@ class HTMLConverter(AbstractJsonlConverter[KT]):
         }
 
     def _get_and_copy_stylesheet(self) -> str:
-        stylesheet = self.kwargs["stylesheet"]
-        if stylesheet:
-            return stylesheet
+        if self.stylesheet:
+            return self.stylesheet
         return self._get_and_copy_default("css")
 
     def _get_and_copy_javascript(self) -> str:
-        javascript = self.kwargs["javascript"]
-        if javascript:
-            return javascript
+        if self.javascript:
+            return self.javascript
         return self._get_and_copy_default("js")
 
     def _get_and_copy_default(self, ext: str) -> str:
