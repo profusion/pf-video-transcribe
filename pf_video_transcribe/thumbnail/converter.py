@@ -8,7 +8,7 @@ from ..converter import AbstractConverter
 from ..jsonl.reader import Reader
 from ..types import Size
 
-_logger = logging.getLogger(__name__.replace(".work", ""))
+_logger = logging.getLogger(__name__.replace(".converter", ""))
 _inf = functools.partial(_logger.log, logging.INFO)
 _err = functools.partial(_logger.log, logging.ERROR)
 
