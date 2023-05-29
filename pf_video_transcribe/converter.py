@@ -41,8 +41,8 @@ class AbstractConverter(ABC):
         self._write()
 
     @classmethod
-    def create_output_name(self, input_filename: str) -> str:
-        return replace_ext(input_filename, self.ext)
+    def create_output_name(cls, input_filename: str) -> str:
+        return replace_ext(input_filename, cls.ext)
 
     def _needs_generate(self) -> bool:
         if self.force:
