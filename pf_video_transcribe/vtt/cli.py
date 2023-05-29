@@ -25,8 +25,8 @@ def handle_command(args: Namespace) -> None:
     )
 
 
-def add_arguments(ap: ArgumentParser) -> None:
-    abstract_cli.add_arguments(ap, True)
+def add_arguments(ap: ArgumentParser, add_files: bool = True) -> None:
+    abstract_cli.add_arguments(ap, add_files)
 
 
 def add_sub_parser(sub: _SubParsersAction) -> ArgumentParser:

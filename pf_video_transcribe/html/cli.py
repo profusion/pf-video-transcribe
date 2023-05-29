@@ -46,8 +46,8 @@ def handle_command(args: Namespace) -> None:
     )
 
 
-def add_arguments(ap: ArgumentParser) -> None:
-    vtt.add_arguments(ap)
+def add_arguments(ap: ArgumentParser, add_files: bool = True) -> None:
+    vtt.add_arguments(ap, add_files)
     ap.add_argument(
         "--html-head-entry",
         action="append",
