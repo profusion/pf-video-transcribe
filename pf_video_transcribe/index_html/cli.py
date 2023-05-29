@@ -4,7 +4,7 @@ from argparse import Namespace
 from argparse import RawTextHelpFormatter
 
 from .. import log
-from ..abstract_subtitles import cli as abstract_cli
+from ..html import cli as html_cli
 from ..utils import check_dir_exists
 
 description = """\
@@ -26,11 +26,15 @@ def handle_command(args: Namespace) -> None:
         args.directory,
         args.force,
         args.duration_threshold,
+        args.thumb_size,
+        args.html_head_entry,
+        args.stylesheet,
+        args.javascript,
     )
 
 
 def add_arguments(ap: ArgumentParser) -> None:
-    abstract_cli.add_arguments(ap, False)
+    html_cli.add_arguments(ap, False)
     ap.add_argument(
         "directory",
         nargs="+",

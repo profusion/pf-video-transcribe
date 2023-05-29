@@ -1,17 +1,20 @@
 from __future__ import annotations
 
+import dataclasses
 import functools
 import logging
 import os
-from typing import Iterator
 from typing import Sequence
 
 from termcolor import colored
 
 from .html_info import HtmlInfo
 from .html_info import parse_html_info
+from ..converter import AbstractConverter
 from ..html.converter import HTMLConverter
 from ..templates import get_template
+from ..thumbnail.converter import ThumbnailConverter
+from ..types import Size
 from ..vtt.converter import VTTConverter
 
 
@@ -36,31 +39,42 @@ def collect(directory: str) -> dict[str, set[str]]:
     return collected
 
 
-def generate_vtt(
-    jsonl_filenames: Sequence[str], force: bool, duration_threshold: float
-) -> Iterator[str]:
-    for c in VTTConverter.batch(
-        jsonl_filenames,
-        force,
-        duration_threshold=duration_threshold,
-    ):
-        yield c.filename
+_jsonl_converters: Sequence[type[AbstractConverter]] = (
+    VTTConverter,
+    ThumbnailConverter,
+    HTMLConverter,
+)
 
 
-def generate_html(jsonl_filenames: Sequence[str], force: bool) -> Iterator[str]:
-    for c in HTMLConverter.batch(jsonl_filenames, force):
-        yield c.filename
+def get_dataclass_field_names(dataclass: type) -> Sequence[str]:
+    return [f.name for f in dataclasses.fields(dataclass) if f.name]
 
 
-def index(directory: str, force: bool, duration_threshold: float) -> None:
+def index(
+    directory: str,
+    force: bool,
+    duration_threshold: float,
+    size: Size,
+    html_head_entry: list[str],
+    stylesheet: str,
+    javascript: str,
+) -> None:
     by_ext = collect(directory)
     jsonl_filenames = tuple(by_ext[".jsonl"])
 
-    for f in generate_vtt(jsonl_filenames, force, duration_threshold):
-        by_ext[".vtt"].add(f)
-
-    for f in generate_html(jsonl_filenames, force):
-        by_ext[".html"].add(f)
+    converter_kwargs = {
+        "duration_threshold": duration_threshold,
+        "size": size,
+        "html_head_entry": html_head_entry,
+        "stylesheet": stylesheet,
+        "javascript": javascript,
+    }
+    for converter_cls in _jsonl_converters:
+        conv_ext = f".{converter_cls.ext}"
+        arg_names = get_dataclass_field_names(converter_cls)
+        kwargs = {k: converter_kwargs[k] for k in arg_names if k in converter_kwargs}
+        for c in converter_cls.batch(jsonl_filenames, force, **kwargs):
+            by_ext.setdefault(conv_ext, set()).add(c.filename)
 
     html_paths = sorted(by_ext[".html"])
     prefix_len = len(directory + os.path.sep)
@@ -91,7 +105,21 @@ def index(directory: str, force: bool, duration_threshold: float) -> None:
 
 
 def index_batch(
-    directories: Sequence[str], force: bool, duration_threshold: float
+    directories: Sequence[str],
+    force: bool,
+    duration_threshold: float,
+    size: Size,
+    html_head_entry: list[str],
+    stylesheet: str,
+    javascript: str,
 ) -> None:
     for d in directories:
-        index(d, force, duration_threshold)
+        index(
+            d,
+            force,
+            duration_threshold,
+            size,
+            html_head_entry,
+            stylesheet,
+            javascript,
+        )
