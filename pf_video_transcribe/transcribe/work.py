@@ -102,6 +102,7 @@ def transcribe(
         beam_size=5,
         vad_filter=True,
         word_timestamps=True,
+        initial_prompt="Please, write with punctuation.",
     )
 
     info_json = _info_tojson(info)
