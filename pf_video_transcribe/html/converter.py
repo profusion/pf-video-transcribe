@@ -20,6 +20,7 @@ from ..vtt.converter import VTTConverter
 
 
 _logger = logging.getLogger(__name__.replace(".converter", ""))
+_dbg = functools.partial(_logger.log, logging.DEBUG)
 _inf = functools.partial(_logger.log, logging.INFO)
 
 _clean_title_from_path_re = re.compile(
@@ -82,7 +83,7 @@ class HTMLConverter(AbstractJsonlConverter):
         dst_name = f"{self.default_resource_name}{os.path.extsep}{ext}"
         dst_path = os.path.join(os.path.dirname(self.filename), dst_name)
         if os.path.exists(dst_path):
-            _inf("Already exists " + colored(dst_path, "cyan"))
+            _dbg("Already exists " + colored(dst_path, "cyan"))
             return dst_name
         src = importlib.resources.open_text(__package__, f"default.{ext}")
         with open(dst_path, "x") as dst:
